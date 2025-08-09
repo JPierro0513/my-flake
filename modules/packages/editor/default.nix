@@ -33,10 +33,10 @@ with lib; {
 
   config = mkIf config.personal.editor.enable {
     environment.systemPackages = with pkgs;
-      optionals config.personal.editor.zed [
+      optionals config.personal.editor.zed.enable [
         zed-editor
       ]
-      ++ optionals config.personal.editor.zed.fhs [
+      ++ optionals config.personal.editor.zed.fhs.enable [
         zed-editor-fhs
       ];
 

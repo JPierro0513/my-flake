@@ -3,43 +3,43 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+      # inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     neovim-nightly = {
       url = "github:nix-community/neovim-nightly-overlay";
-      inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+      # inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs = {
     self,
     nixpkgs,
-    flake-utils,
     home-manager,
     neovim-nightly,
     ...
-  }:
-    flake-utils.lib.eachDefaultSystem (system: let
-      # pkgs = import nixpkgs {
-      #   inherit system;
-      #   config.allowUnfree = true;
-      #   overlays = [
-      #     neovim-nightly.overlays.default
-      #   ];
-      # };
-    in {
-      nixosModules = {
-        default = ./modules;
-        system = ./modules/system;
-        packages = ./modules/packages;
-        # desktop = ./modules/desktop;
-      };
+  }: {
+    nixosModules = {
+      default = ./modules;
 
-      overlays.default = import ./overlays;
+      system = ./modules/system;
+      nix-conf = ./modules/system/nix-config;
+      shell = ./modules/system/shell;
 
-      # packages = import ./packages;
-    });
+      packages = ./modules/packages;
+      development = ./modules/packages/development;
+      editor = ./modules/packages/editor;
+
+      # desktop = ./modules/desktop;
+    };
+
+    overlays.default = final: prev: {
+      neovim = neovim-nightly.packages.${final.system}.default;
+    };
+
+    # packages = import ./packages;
+  };
 }

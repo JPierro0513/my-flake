@@ -25,6 +25,7 @@ with lib; {
   config = mkIf config.personal.development.enable {
     environment.systemPackages = with pkgs;
       [
+        gh
         wget
         curl
         package-version-server
